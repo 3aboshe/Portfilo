@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import { useInView, useScrollProgress } from './hooks/useScrollProgress';
+import { useState, useEffect } from 'react';
+import { useInView } from './hooks/useScrollProgress';
+import InfiniteGallery from './components/ui/3d-gallery-photography';
 import homepageMe from '/images/homepage-me.png';
 import nationalCTF from '/images/National CyberSecurity CTF.png';
 import innovationHonoring from '/images/2nd Place – Innovation Challenge Bootcamp 2025 (American University of Kurdistan, Duhok) Honoring.jpeg';
@@ -13,91 +14,67 @@ import voluntaryAward from '/images/Honoring-Me-For-3rd Place – National Volun
 import hackathonWinning from '/images/Me-Winning-University-Of-Mosul_Hackathon-Second-Place.jpg';
 import facilitating from '/images/Me-Facilititing-Conversitoinal_Club.jpg';
 
-// Animated Background
-function AnimatedBackground() {
+// All images for the 3D gallery
+const galleryImages = [
+  homepageMe,
+  nationalCTF,
+  innovationHonoring,
+  innovationPitching,
+  innovationPitching2,
+  cyberkhanaPitching,
+  cyberkhanaPitching2,
+  cyberkhanaAudience,
+  cyberkhanaPlayers,
+  voluntaryAward,
+  hackathonWinning,
+  facilitating,
+];
+
+// Hero Section with 3D Gallery
+function Hero() {
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl animate-pulse delay-700" />
-      <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-yellow-200/20 rounded-full blur-3xl animate-pulse delay-1000" />
-    </div>
-  );
-}
+    <section className="relative h-screen w-full overflow-hidden">
+      {/* 3D Gallery Background - scrolls through all 12 images once */}
+      <InfiniteGallery
+        images={galleryImages}
+        speed={0.8}
+        zSpacing={2.5}
+        visibleCount={12}
+        singleLoop={true}
+        fadeSettings={{
+          fadeIn: { start: 0.0, end: 0.15 },
+          fadeOut: { start: 0.85, end: 1.0 },
+        }}
+        blurSettings={{
+          blurIn: { start: 0.0, end: 0.1 },
+          blurOut: { start: 0.85, end: 1.0 },
+          maxBlur: 6.0,
+        }}
+        className="h-screen w-full"
+      />
 
-// Hero Section
-function Hero({ onScrollProgress }) {
-  const [ref, inView] = useInView(0.1);
-  const quoteScale = Math.max(0.8, 1 - onScrollProgress * 0.5);
-  const quoteOpacity = Math.max(0, 1 - onScrollProgress * 1.5);
-
-  return (
-    <section ref={ref} className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 opacity-50">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-amber-300/30 rounded-full filter blur-[128px] animate-pulse" />
-        <div className="absolute bottom-20 right-20 w-72 h-72 bg-orange-300/30 rounded-full filter blur-[128px] animate-pulse delay-1000" />
-      </div>
-
-      {/* Floating particles */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-amber-800/20 rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center px-6">
-        {/* Smaller contained image */}
-        <div
-          className="relative mb-12 rounded-2xl overflow-hidden shadow-2xl shadow-amber-900/10"
-          style={{
-            transform: `scale(${quoteScale})`,
-            opacity: quoteOpacity,
-            maxWidth: '500px',
-            width: '90%',
-          }}
-        >
-          <img
-            src={homepageMe}
-            alt="Abdulrahman Majid"
-            className="w-full h-auto object-cover"
-          />
-          {/* Image overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-amber-900/10 to-transparent" />
-        </div>
-
-        {/* Quote */}
-        <div
-          className="text-center max-w-3xl"
-          style={{
-            transform: `scale(${quoteScale})`,
-            opacity: quoteOpacity,
-          }}
-        >
-          <p className="font-display text-4xl md:text-6xl lg:text-7xl text-amber-950 font-medium leading-tight tracking-tight">
+      {/* Quote Overlay - Clean centered text */}
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center px-6">
+        <div className="relative text-center">
+          <p className="font-display text-4xl md:text-6xl lg:text-7xl text-amber-950 font-medium leading-tight tracking-tight drop-shadow-lg">
             "I create change, therefore I am."
           </p>
+
+          {/* Scroll hint */}
+          <div className="mt-12 flex flex-col items-center gap-3">
+            <div className="w-6 h-10 border-2 border-amber-800/30 rounded-full flex justify-center pt-2">
+              <div className="w-1 h-3 bg-amber-800/50 rounded-full animate-bounce" />
+            </div>
+            <p className="text-amber-700/60 text-sm uppercase tracking-wider">Scroll to explore</p>
+          </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        style={{ opacity: 1 - onScrollProgress * 3 }}
-      >
-        <div className="w-6 h-10 border-2 border-amber-800/20 rounded-full flex justify-center pt-2">
-          <div className="w-1 h-3 bg-amber-800/40 rounded-full animate-bounce" />
-        </div>
-        <p className="text-amber-800/50 text-sm">Scroll to explore</p>
+      {/* Navigation hint at bottom */}
+      <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none">
+        <p className="font-mono uppercase text-[11px] font-semibold text-amber-800/50">
+          Use mouse wheel or arrow keys to navigate
+        </p>
       </div>
     </section>
   );
@@ -111,11 +88,6 @@ function IdentityReveal() {
   return (
     <section ref={ref} className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-b from-amber-50 to-orange-50">
       <div className="max-w-5xl mx-auto px-6 text-center">
-        <div className="mb-8 inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur border border-amber-200/50 rounded-full">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          <span className="text-amber-800/70 text-sm">Available for opportunities</span>
-        </div>
-
         <h1
           ref={nameRef}
           className={`font-display text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-amber-900 via-orange-900 to-amber-950 bg-clip-text text-transparent tracking-tight transition-all duration-1000 ${
@@ -353,8 +325,8 @@ function Achievements() {
       <AchievementMoment
         image={voluntaryAward}
         title="3rd Place"
-        subtitle="National Voluntary Excellence Award"
-        description="Recognized for outstanding contributions to community service and volunteer initiatives."
+        subtitle="National Science Day for Voluntary Work Award"
+        description="Honored by the College of Computer Science and Mathematics, University of Mosul, for winning with team 'Let's Talk UOM' at the national level in Iraq. Received a certificate of appreciation from Dean Dr. Doha Bashir Abdullah for outstanding contributions to community service and volunteer initiatives."
       />
 
       <AchievementMoment
@@ -404,7 +376,7 @@ function CyberKhana() {
         {/* Stats */}
         <div className="grid md:grid-cols-3 gap-6 mb-16">
           {[
-            { value: "100+", label: "Students Impacted" },
+            { value: "150+", label: "Students Impacted" },
             { value: "Custom", label: "CTF Platform" },
             { value: "Real-world", label: "Challenges" },
           ].map((stat, index) => (
@@ -523,6 +495,67 @@ function Projects() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Education Section
+function Education() {
+  const [ref, inView] = useInView(0.3);
+
+  const education = [
+    {
+      school: "University of Mosul",
+      degree: "Bachelor's in Computer Science",
+      period: "2021 - Present",
+      description: "Focusing on cybersecurity, network security, and ethical hacking.",
+    },
+  ];
+
+  return (
+    <section ref={ref} className="py-32 bg-amber-50">
+      <div className="max-w-4xl mx-auto px-6">
+        <div
+          className={`text-center mb-20 transition-all duration-1000 ${
+            inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+          }`}
+        >
+          <p className="text-amber-600 font-medium mb-4">EDUCATION</p>
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-amber-950">Academic Background</h2>
+        </div>
+
+        <div className="space-y-8">
+          {education.map((edu, index) => (
+            <div
+              key={index}
+              className={`transition-all duration-700 ${
+                inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+              }`}
+              style={{ transitionDelay: `${index * 150}ms` }}
+            >
+              <div className="p-8 bg-white/60 backdrop-blur border border-amber-200/50 rounded-2xl hover:bg-white/80 hover:border-amber-400/30 transition-all duration-300">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6 16m-6-16h6m-6 0h-6" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-display text-2xl md:text-3xl font-bold text-amber-950 mb-1">{edu.school}</h3>
+                      <p className="text-amber-700 text-lg">{edu.degree}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-amber-600 font-medium">{edu.period}</p>
+                  </div>
+                </div>
+                <p className="mt-4 text-amber-800/60 pl-16">{edu.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -666,7 +699,21 @@ function Contact() {
 
 // Scroll Progress Indicator
 function ScrollProgress() {
-  const progress = useScrollProgress();
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const updateScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progressValue = scrollTop / docHeight;
+      setProgress(Math.min(progressValue, 1));
+    };
+
+    window.addEventListener('scroll', updateScroll, { passive: true });
+    updateScroll();
+
+    return () => window.removeEventListener('scroll', updateScroll);
+  }, []);
 
   return (
     <div className="fixed top-0 left-0 right-0 h-1 bg-amber-200/50 z-50">
@@ -680,19 +727,17 @@ function ScrollProgress() {
 
 // Main App
 function App() {
-  const scrollProgress = useScrollProgress();
-
   return (
     <div className="min-h-screen bg-amber-50">
-      <AnimatedBackground />
       <ScrollProgress />
-      <Hero onScrollProgress={scrollProgress} />
+      <Hero />
       <IdentityReveal />
       <Philosophy />
       <NationalCTF />
       <Achievements />
       <CyberKhana />
       <Projects />
+      <Education />
       <Certifications />
       <Contact />
     </div>
