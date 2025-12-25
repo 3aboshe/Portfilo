@@ -1,17 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { useInView, useScrollProgress } from './hooks/useScrollProgress';
-import homepageMe from './assets/homepage-me.png';
-import nationalCTF from './assets/National CyberSecurity CTF.png';
-import innovationHonoring from './assets/2nd Place – Innovation Challenge Bootcamp 2025 (American University of Kurdistan, Duhok) Honoring.jpeg';
-import innovationPitching from './assets/2nd Place – Innovation Challenge Bootcamp 2025 (American University of Kurdistan, Duhok) Me Pitching.jpeg';
-import innovationPitching2 from './assets/2nd Place – Innovation Challenge Bootcamp 2025 (American University of Kurdistan, Duhok) Me Pitching 2.jpeg';
-import cyberkhanaPitching from './assets/CyberKhana-Me-Pitching.jpg';
-import cyberkhanaPitching2 from './assets/CyberKhana-Me-Pitching 2.jpg';
-import cyberkhanaAudience from './assets/CyberKhana-Me-Pitching and front of me audience.jpg';
-import cyberkhanaPlayers from './assets/CyberKhana-Players-Solving.jpg';
-import voluntaryAward from './assets/Honoring-Me-For-3rd Place – National Voluntary Excellence Award.jpg';
-import hackathonWinning from './assets/Me-Winning-University-Of-Mosul_Hackathon-Second-Place.jpg';
-import facilitating from './assets/Me-Facilititing-Conversitoinal_Club.jpg';
+import homepageMe from '/images/homepage-me.png';
+import nationalCTF from '/images/National CyberSecurity CTF.png';
+import innovationHonoring from '/images/2nd Place – Innovation Challenge Bootcamp 2025 (American University of Kurdistan, Duhok) Honoring.jpeg';
+import innovationPitching from '/images/2nd Place – Innovation Challenge Bootcamp 2025 (American University of Kurdistan, Duhok) Me Pitching.jpeg';
+import innovationPitching2 from '/images/2nd Place – Innovation Challenge Bootcamp 2025 (American University of Kurdistan, Duhok) Me Pitching 2.jpeg';
+import cyberkhanaPitching from '/images/CyberKhana-Me-Pitching.jpg';
+import cyberkhanaPitching2 from '/images/CyberKhana-Me-Pitching 2.jpg';
+import cyberkhanaAudience from '/images/CyberKhana-Me-Pitching and front of me audience.jpg';
+import cyberkhanaPlayers from '/images/CyberKhana-Players-Solving.jpg';
+import voluntaryAward from '/images/Honoring-Me-For-3rd Place – National Voluntary Excellence Award.jpg';
+import hackathonWinning from '/images/Me-Winning-University-Of-Mosul_Hackathon-Second-Place.jpg';
+import facilitating from '/images/Me-Facilititing-Conversitoinal_Club.jpg';
 
 // Hero Section
 function Hero({ onScrollProgress }) {

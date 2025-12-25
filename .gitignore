@@ -22,3 +22,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Empty assets folder (images moved to public/images)
+src/assets/
