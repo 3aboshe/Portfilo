@@ -3,6 +3,7 @@ import { useInView } from './hooks/useScrollProgress';
 import InfiniteGallery from './components/ui/3d-gallery-photography';
 import homepageMe from '/images/homepage-me.png';
 import nationalCTF from '/images/National CyberSecurity CTF.png';
+import ncseCTF from '/images/NCSE_CTF_3rd.JPG';
 import innovationHonoring from '/images/2nd Place – Innovation Challenge Bootcamp 2025 (American University of Kurdistan, Duhok) Honoring.jpeg';
 import innovationPitching from '/images/2nd Place – Innovation Challenge Bootcamp 2025 (American University of Kurdistan, Duhok) Me Pitching.jpeg';
 import innovationPitching2 from '/images/2nd Place – Innovation Challenge Bootcamp 2025 (American University of Kurdistan, Duhok) Me Pitching 2.jpeg';
@@ -13,10 +14,14 @@ import cyberkhanaPlayers from '/images/CyberKhana-Players-Solving.jpg';
 import voluntaryAward from '/images/Honoring-Me-For-3rd Place – National Voluntary Excellence Award.jpg';
 import hackathonWinning from '/images/Me-Winning-University-Of-Mosul_Hackathon-Second-Place.jpg';
 import facilitating from '/images/Me-Facilititing-Conversitoinal_Club.jpg';
+import nullOSLogo from '/images/NullOS.png';
+import edconaLogo from '/images/EdconaIcon.png';
+import universityLogo from '/images/university_of_mosul_logo.png';
+import hackviserLogo from '/images/Hackviser_logo.jpeg';
 
-// All images for the 3D gallery
+// Gallery images - homepage-me.png is NOT included (shown separately at end)
 const galleryImages = [
-  homepageMe,
+  ncseCTF,
   nationalCTF,
   innovationHonoring,
   innovationPitching,
@@ -30,38 +35,103 @@ const galleryImages = [
   facilitating,
 ];
 
-// Hero Section with 3D Gallery
+// Hero Section with 3D Gallery and Scroll-Jacking
 function Hero() {
+  // Check if user is at top of page on load
+  const isAtTop = typeof window !== 'undefined' && window.scrollY < 100;
+  const [isLocked, setIsLocked] = useState(isAtTop);
+  const [galleryComplete, setGalleryComplete] = useState(!isAtTop);
+  const [showFinalImage, setShowFinalImage] = useState(!isAtTop);
+
+  // Lock body scroll only when at hero section and gallery not complete
+  useEffect(() => {
+    // If user scrolled down before page load, skip the animation
+    if (window.scrollY > 100) {
+      setIsLocked(false);
+      setGalleryComplete(true);
+      setShowFinalImage(true);
+      return;
+    }
+
+    if (isLocked) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isLocked]);
+
+  const handleGalleryComplete = () => {
+    setGalleryComplete(true);
+    // Show the final image with animation
+    setTimeout(() => {
+      setShowFinalImage(true);
+    }, 300);
+    // Unlock scroll after final image appears
+    setTimeout(() => {
+      setIsLocked(false);
+    }, 1000);
+  };
+
   return (
-    <section className="relative h-screen w-full overflow-hidden">
-      {/* 3D Gallery Background - scrolls through all 12 images once */}
-      <InfiniteGallery
-        images={galleryImages}
-        speed={0.8}
-        zSpacing={2.5}
-        visibleCount={12}
-        singleLoop={true}
-        fadeSettings={{
-          fadeIn: { start: 0.0, end: 0.15 },
-          fadeOut: { start: 0.85, end: 1.0 },
-        }}
-        blurSettings={{
-          blurIn: { start: 0.0, end: 0.1 },
-          blurOut: { start: 0.85, end: 1.0 },
-          maxBlur: 6.0,
-        }}
-        className="h-screen w-full"
-      />
+    <section className="relative h-screen w-full overflow-hidden bg-amber-50">
+      {/* 3D Gallery Background - scrolls through achievement images */}
+      <div className={`transition-opacity duration-400 ${galleryComplete ? 'opacity-0' : 'opacity-100'}`}>
+        <InfiniteGallery
+          images={galleryImages}
+          speed={2.0}
+          zSpacing={2.5}
+          visibleCount={6}
+          singleLoop={true}
+          finalImageIndex={-1}
+          onComplete={handleGalleryComplete}
+          fadeSettings={{
+            fadeIn: { start: 0.0, end: 0.15 },
+            fadeOut: { start: 0.85, end: 1.0 },
+          }}
+          blurSettings={{
+            blurIn: { start: 0.0, end: 0.1 },
+            blurOut: { start: 0.85, end: 1.0 },
+            maxBlur: 6.0,
+          }}
+          className="h-screen w-full"
+        />
+      </div>
+
+      {/* Final profile image - appears from center after gallery completes */}
+      <div
+        className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ease-out ${
+          showFinalImage
+            ? 'opacity-100 scale-100'
+            : 'opacity-0 scale-50'
+        }`}
+        style={{ zIndex: 5 }}
+      >
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 rounded-2xl blur-3xl opacity-30 scale-110" />
+          <img
+            src={homepageMe}
+            alt="Abdulrahman Majid Adnan"
+            className="relative max-h-[70vh] max-w-[90vw] object-contain rounded-2xl shadow-2xl"
+          />
+        </div>
+      </div>
 
       {/* Quote Overlay - Clean centered text */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center px-6">
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center px-6 z-10">
         <div className="relative text-center">
-          <p className="font-display text-4xl md:text-6xl lg:text-7xl text-amber-950 font-medium leading-tight tracking-tight drop-shadow-lg">
+          <p className={`font-display text-4xl md:text-6xl lg:text-7xl font-medium leading-tight tracking-tight transition-all duration-500 ${
+            showFinalImage
+              ? 'text-white drop-shadow-[0_2px_15px_rgba(0,0,0,0.7)]'
+              : 'text-amber-950 drop-shadow-lg'
+          }`}>
             "I create change, therefore I am."
           </p>
 
-          {/* Scroll hint */}
-          <div className="mt-12 flex flex-col items-center gap-3">
+          {/* Scroll hint - hide when complete */}
+          <div className={`mt-12 flex flex-col items-center gap-3 transition-opacity duration-500 ${galleryComplete ? 'opacity-0' : 'opacity-100'}`}>
             <div className="w-6 h-10 border-2 border-amber-800/30 rounded-full flex justify-center pt-2">
               <div className="w-1 h-3 bg-amber-800/50 rounded-full animate-bounce" />
             </div>
@@ -70,27 +140,41 @@ function Hero() {
         </div>
       </div>
 
-      {/* Navigation hint at bottom */}
-      <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none">
-        <p className="font-mono uppercase text-[11px] font-semibold text-amber-800/50">
-          Use mouse wheel or arrow keys to navigate
-        </p>
-      </div>
+      {/* Continue hint after final image appears */}
+      {showFinalImage && (
+        <div className="absolute bottom-12 left-0 right-0 text-center pointer-events-none animate-pulse z-10">
+          <div className="flex flex-col items-center gap-2">
+            <svg className="w-6 h-6 text-white/80 animate-bounce drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+            <p className="text-white/80 text-sm uppercase tracking-wider drop-shadow-lg">Scroll to continue</p>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation hint at bottom - only show while gallery is active */}
+      {!galleryComplete && (
+        <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none">
+          <p className="font-mono uppercase text-[11px] font-semibold text-amber-800/50">
+            Use mouse wheel or arrow keys to navigate
+          </p>
+        </div>
+      )}
     </section>
   );
 }
 
 // Identity Reveal Section
 function IdentityReveal() {
-  const [ref, inView] = useInView(0.3);
-  const [nameRef, nameInView] = useInView(0.5);
+  const [ref, inView] = useInView(0.1);
+  const [nameRef, nameInView] = useInView(0.15);
 
   return (
     <section ref={ref} className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-b from-amber-50 to-orange-50">
       <div className="max-w-5xl mx-auto px-6 text-center">
         <h1
           ref={nameRef}
-          className={`font-display text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-amber-900 via-orange-900 to-amber-950 bg-clip-text text-transparent tracking-tight transition-all duration-1000 ${
+          className={`font-display text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-amber-900 via-orange-900 to-amber-950 bg-clip-text text-transparent tracking-tight transition-all duration-500 ${
             nameInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           }`}
         >
@@ -98,7 +182,7 @@ function IdentityReveal() {
         </h1>
 
         <div
-          className={`mt-10 flex flex-wrap justify-center gap-4 text-sm text-amber-800/80 font-medium transition-all duration-1000 delay-300 ${
+          className={`mt-10 flex flex-wrap justify-center gap-4 text-sm text-amber-800/80 font-medium transition-all duration-500 delay-300 ${
             nameInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
@@ -119,12 +203,12 @@ function IdentityReveal() {
 
         {/* Stats preview */}
         <div
-          className={`mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto transition-all duration-1000 delay-500 ${
+          className={`mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto transition-all duration-500 delay-500 ${
             nameInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
           {[
-            { value: '4th', label: 'National CTF' },
+            { value: '3rd', label: 'National CTF' },
             { value: '100+', label: 'Students' },
             { value: '2', label: 'Certifications' },
           ].map((stat, i) => (
@@ -141,10 +225,10 @@ function IdentityReveal() {
 
 // Philosophy Section
 function Philosophy() {
-  const [ref1, inView1] = useInView(0.6);
-  const [ref2, inView2] = useInView(0.6);
-  const [ref3, inView3] = useInView(0.6);
-  const [ref4, inView4] = useInView(0.6);
+  const [ref1, inView1] = useInView(0.1);
+  const [ref2, inView2] = useInView(0.1);
+  const [ref3, inView3] = useInView(0.1);
+  const [ref4, inView4] = useInView(0.1);
 
   const thoughts = [
     { ref: ref1, inView: inView1, text: "Security is not a skill—it is a responsibility.", delay: "" },
@@ -165,7 +249,7 @@ function Philosophy() {
           <div
             key={index}
             ref={thought.ref}
-            className={`mb-16 group transition-all duration-1000 ${thought.delay} ${
+            className={`mb-16 group transition-all duration-500 ${thought.delay} ${
               thought.inView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
             }`}
           >
@@ -184,8 +268,8 @@ function Philosophy() {
 
 // National CTF - Main Centerpiece
 function NationalCTF() {
-  const [ref, inView] = useInView(0.2);
-  const [statsRef, statsInView] = useInView(0.4);
+  const [ref, inView] = useInView(0.1);
+  const [statsRef, statsInView] = useInView(0.1);
 
   return (
     <section ref={ref} className="relative py-32 bg-gradient-to-br from-amber-100 via-orange-50 to-amber-50 text-amber-950 overflow-hidden">
@@ -198,7 +282,7 @@ function NationalCTF() {
       <div className="relative max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div
-            className={`transition-all duration-1200 delay-200 ${
+            className={`transition-all duration-500 delay-200 ${
               inView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
             }`}
           >
@@ -217,7 +301,7 @@ function NationalCTF() {
 
             <div
               ref={statsRef}
-              className={`space-y-6 transition-all duration-1000 delay-500 ${
+              className={`space-y-6 transition-all duration-500 delay-500 ${
                 statsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
             >
@@ -239,7 +323,7 @@ function NationalCTF() {
           </div>
 
           <div
-            className={`relative transition-all duration-1200 delay-400 ${
+            className={`relative transition-all duration-500 delay-400 ${
               inView ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
             }`}
           >
@@ -249,7 +333,7 @@ function NationalCTF() {
                 <img
                   src={nationalCTF}
                   alt="National Cybersecurity CTF"
-                  className="w-full h-auto hover:scale-105 transition-transform duration-700"
+                  className="w-full h-auto hover:scale-105 transition-transform duration-400"
                 />
               </div>
             </div>
@@ -260,16 +344,100 @@ function NationalCTF() {
   );
 }
 
+// NCSE CTF 3rd Place - Major Achievement
+function NCSECyberEvent() {
+  const [ref, inView] = useInView(0.1);
+  const [statsRef, statsInView] = useInView(0.1);
+
+  return (
+    <section ref={ref} className="relative py-24 bg-gradient-to-br from-orange-100 via-amber-50 to-orange-50 text-amber-950 overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-orange-300/20 rounded-full filter blur-[128px]" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-amber-300/20 rounded-full filter blur-[128px]" />
+      </div>
+
+      <div className="relative max-w-6xl mx-auto px-6">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+          <div
+            className={`relative transition-all duration-500 delay-200 ${
+              inView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
+            }`}
+          >
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-amber-400 rounded-2xl blur-2xl opacity-20" />
+              <div className="relative overflow-hidden rounded-2xl border border-amber-200/50 shadow-xl">
+                <img
+                  src={ncseCTF}
+                  alt="3rd Place National Cybersecurity Event"
+                  className="w-full h-auto hover:scale-105 transition-transform duration-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={`transition-all duration-500 delay-400 ${
+              inView ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
+            }`}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/60 backdrop-blur rounded-full mb-4 border border-amber-200/50">
+              <svg className="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              <span className="text-xs font-medium uppercase tracking-wide">Major Achievement</span>
+            </div>
+
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
+              3rd Place
+            </h2>
+            <h3 className="font-display text-xl md:text-2xl text-orange-700 font-semibold mb-2">
+              National Cybersecurity Event
+            </h3>
+            <p className="text-amber-800/60 text-base mb-6">Ministry of Communications — 2025</p>
+
+            <div
+              ref={statsRef}
+              className={`grid grid-cols-3 gap-4 mb-6 transition-all duration-500 delay-500 ${
+                statsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
+            >
+              <div className="text-center p-3 bg-white/40 rounded-xl">
+                <span className="text-2xl md:text-3xl font-display font-bold text-amber-950 block">200+</span>
+                <span className="text-amber-800/60 text-xs">teams</span>
+              </div>
+              <div className="text-center p-3 bg-white/40 rounded-xl">
+                <span className="text-2xl md:text-3xl font-display font-bold text-amber-950 block">~800</span>
+                <span className="text-amber-800/60 text-xs">participants</span>
+              </div>
+              <div className="text-center p-3 bg-white/40 rounded-xl">
+                <span className="text-2xl md:text-3xl font-display font-bold text-orange-600 block">3rd</span>
+                <span className="text-amber-950 text-xs font-medium">nationally</span>
+              </div>
+            </div>
+
+            <div className="p-4 bg-white/40 backdrop-blur rounded-xl border border-amber-200/30">
+              <p className="text-amber-800/70 text-sm leading-relaxed">
+                <span className="font-semibold text-amber-950">Honored by H.E. Dr. Hiyam Al-Yasiri</span>, Minister of Communications, for outstanding achievement. Recognized for strong teamwork and technical problem-solving across qualification and final stages.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // Achievement Moment Component
 function AchievementMoment({ image, title, subtitle, description, reverse = false }) {
-  const [ref, inView] = useInView(0.3);
+  const [ref, inView] = useInView(0.1);
 
   return (
     <section ref={ref} className="py-24 bg-orange-50">
       <div className="max-w-6xl mx-auto px-6">
         <div className={`grid md:grid-cols-2 gap-8 md:gap-16 items-center ${reverse ? 'md:grid-flow-col-dense' : ''}`}>
           <div
-            className={`relative transition-all duration-1000 ${
+            className={`relative transition-all duration-500 ${
               inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             } ${reverse ? 'md:col-start-2' : ''}`}
           >
@@ -279,14 +447,14 @@ function AchievementMoment({ image, title, subtitle, description, reverse = fals
                 <img
                   src={image}
                   alt={title}
-                  className="w-full h-auto hover:scale-105 transition-transform duration-700"
+                  className="w-full h-auto hover:scale-105 transition-transform duration-400"
                 />
               </div>
             </div>
           </div>
 
           <div
-            className={`transition-all duration-1000 delay-300 ${
+            className={`transition-all duration-500 delay-300 ${
               inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             } ${reverse ? 'md:col-start-1' : ''}`}
           >
@@ -342,8 +510,8 @@ function Achievements() {
 
 // Cyber Khana Section
 function CyberKhana() {
-  const [ref, inView] = useInView(0.2);
-  const [contentRef, contentInView] = useInView(0.3);
+  const [ref, inView] = useInView(0.1);
+  const [contentRef, contentInView] = useInView(0.1);
 
   return (
     <section ref={ref} className="py-32 bg-gradient-to-b from-amber-50 to-orange-50 relative">
@@ -354,7 +522,7 @@ function CyberKhana() {
       <div className="relative max-w-7xl mx-auto px-6">
         <div
           ref={contentRef}
-          className={`text-center mb-16 transition-all duration-1000 ${
+          className={`text-center mb-16 transition-all duration-500 ${
             contentInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           }`}
         >
@@ -399,28 +567,28 @@ function CyberKhana() {
             <img
               src={cyberkhanaAudience}
               alt="CyberKhana Audience"
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-400"
             />
           </div>
           <div className="overflow-hidden rounded-2xl">
             <img
               src={cyberkhanaPitching}
               alt="CyberKhana Pitching"
-              className="w-full h-64 object-cover hover:scale-105 transition-transform duration-700"
+              className="w-full h-64 object-cover hover:scale-105 transition-transform duration-400"
             />
           </div>
           <div className="overflow-hidden rounded-2xl">
             <img
               src={cyberkhanaPitching2}
               alt="CyberKhana Pitching 2"
-              className="w-full h-64 object-cover hover:scale-105 transition-transform duration-700"
+              className="w-full h-64 object-cover hover:scale-105 transition-transform duration-400"
             />
           </div>
           <div className="md:col-span-3 overflow-hidden rounded-2xl">
             <img
               src={cyberkhanaPlayers}
               alt="CyberKhana Players"
-              className="w-full h-96 object-cover hover:scale-105 transition-transform duration-700"
+              className="w-full h-96 object-cover hover:scale-105 transition-transform duration-400"
             />
           </div>
         </div>
@@ -454,47 +622,91 @@ function CyberKhana() {
 
 // Projects Section
 function Projects() {
-  const [ref, inView] = useInView(0.2);
+  const [ref, inView] = useInView(0.1);
 
-  const project = {
-    name: "NullOS",
-    description: "An immersive cybersecurity educational game that simulates real-world scenarios.",
-    highlight: "Educational Game",
-  };
+  const projects = [
+    {
+      name: "NullOS",
+      description: "An immersive cybersecurity educational game that simulates real-world scenarios.",
+      highlight: "Educational Game",
+      icon: nullOSLogo,
+      links: [],
+    },
+    {
+      name: "EdCona",
+      description: "A mobile app for connecting Parents and Teachers, streamlining communication and student progress tracking.",
+      highlight: "Mobile App",
+      icon: edconaLogo,
+      links: [
+        { label: "App Store", url: "https://apps.apple.com/us/app/edcona/id6757746545", icon: "apple" },
+        { label: "Google Play", url: "https://play.google.com/store/apps/details?id=com.edcona.app&pcampaignid=web_share", icon: "android" },
+      ],
+    },
+  ];
 
   return (
     <section ref={ref} className="py-32 bg-amber-50">
       <div className="max-w-4xl mx-auto px-6">
         <div
-          className={`text-center mb-20 transition-all duration-1000 ${
+          className={`text-center mb-20 transition-all duration-500 ${
             inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           }`}
         >
           <p className="text-amber-600 font-medium mb-4">CREATED</p>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-amber-950">Project</h2>
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-amber-950">Projects</h2>
         </div>
 
-        <div
-          className={`transition-all duration-700 ${
-            inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-          }`}
-        >
-          <div className="p-8 bg-white/60 backdrop-blur border border-amber-200/50 rounded-2xl hover:bg-white/80 hover:border-amber-400/30 transition-all duration-300">
-            <div className="flex items-start gap-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-amber-600 text-sm uppercase tracking-widest mb-2">{project.highlight}</p>
-                <h3 className="font-display text-2xl md:text-3xl font-bold text-amber-950 mb-3">
-                  {project.name}
-                </h3>
-                <p className="text-amber-800/60 leading-relaxed">{project.description}</p>
+        <div className="space-y-6">
+          {projects.map((project, index) => (
+            <div
+              key={index}
+              className={`transition-all duration-400 ${
+                inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+              }`}
+              style={{ transitionDelay: `${index * 150}ms` }}
+            >
+              <div className="p-8 bg-white/60 backdrop-blur border border-amber-200/50 rounded-2xl hover:bg-white/80 hover:border-amber-400/30 transition-all duration-300">
+                <div className="flex items-start gap-6">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
+                    <img src={project.icon} alt={project.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-amber-600 text-sm uppercase tracking-widest mb-2">{project.highlight}</p>
+                    <h3 className="font-display text-2xl md:text-3xl font-bold text-amber-950 mb-3">
+                      {project.name}
+                    </h3>
+                    <p className="text-amber-800/60 leading-relaxed mb-4">{project.description}</p>
+
+                    {project.links.length > 0 && (
+                      <div className="flex flex-wrap gap-3">
+                        {project.links.map((link, linkIndex) => (
+                          <a
+                            key={linkIndex}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-full text-sm font-medium transition-colors"
+                          >
+                            {link.icon === "apple" && (
+                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                              </svg>
+                            )}
+                            {link.icon === "android" && (
+                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.4-.59-2.94-.92-4.47-.92s-3.07.33-4.47.92L5.65 5.67c-.19-.29-.54-.38-.84-.22-.3.16-.42.54-.26.85L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25S6.31 12.75 7 12.75s1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/>
+                              </svg>
+                            )}
+                            {link.label}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
@@ -503,14 +715,14 @@ function Projects() {
 
 // Education Section
 function Education() {
-  const [ref, inView] = useInView(0.3);
+  const [ref, inView] = useInView(0.1);
 
   const education = [
     {
       school: "University of Mosul",
-      degree: "Bachelor's in Computer Science",
-      period: "2021 - Present",
-      description: "Focusing on cybersecurity, network security, and ethical hacking.",
+      degree: "B.Sc. Computer Science — Cybersecurity Department",
+      period: "Level 3",
+      description: "Specializing in cybersecurity, network security, and ethical hacking.",
     },
   ];
 
@@ -518,7 +730,7 @@ function Education() {
     <section ref={ref} className="py-32 bg-amber-50">
       <div className="max-w-4xl mx-auto px-6">
         <div
-          className={`text-center mb-20 transition-all duration-1000 ${
+          className={`text-center mb-20 transition-all duration-500 ${
             inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           }`}
         >
@@ -530,7 +742,7 @@ function Education() {
           {education.map((edu, index) => (
             <div
               key={index}
-              className={`transition-all duration-700 ${
+              className={`transition-all duration-400 ${
                 inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
               }`}
               style={{ transitionDelay: `${index * 150}ms` }}
@@ -538,10 +750,8 @@ function Education() {
               <div className="p-8 bg-white/60 backdrop-blur border border-amber-200/50 rounded-2xl hover:bg-white/80 hover:border-amber-400/30 transition-all duration-300">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6 16m-6-16h6m-6 0h-6" />
-                      </svg>
+                    <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-white">
+                      <img src={universityLogo} alt="University of Mosul" className="w-full h-full object-contain" />
                     </div>
                     <div>
                       <h3 className="font-display text-2xl md:text-3xl font-bold text-amber-950 mb-1">{edu.school}</h3>
@@ -564,7 +774,7 @@ function Education() {
 
 // Certifications Section
 function Certifications() {
-  const [ref, inView] = useInView(0.3);
+  const [ref, inView] = useInView(0.1);
 
   const certs = [
     {
@@ -581,7 +791,7 @@ function Certifications() {
     <section ref={ref} className="py-32 bg-gradient-to-b from-amber-50 to-orange-50">
       <div className="max-w-4xl mx-auto px-6">
         <div
-          className={`text-center mb-16 transition-all duration-1000 ${
+          className={`text-center mb-16 transition-all duration-500 ${
             inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           }`}
         >
@@ -596,7 +806,7 @@ function Certifications() {
               href={cert.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`block group transition-all duration-700 ${
+              className={`block group transition-all duration-400 ${
                 inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
               style={{ transitionDelay: `${index * 150}ms` }}
@@ -604,10 +814,8 @@ function Certifications() {
               <div className="p-8 bg-white/60 backdrop-blur border border-amber-200/50 rounded-2xl group-hover:bg-white/80 group-hover:border-amber-400/30 transition-all duration-300">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                      </svg>
+                    <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                      <img src={hackviserLogo} alt="Hackviser" className="w-full h-full object-cover" />
                     </div>
                     <h3 className="font-display text-xl md:text-2xl font-bold text-amber-950">{cert.name}</h3>
                   </div>
@@ -629,13 +837,12 @@ function Certifications() {
 
 // Contact Section
 function Contact() {
-  const [ref, inView] = useInView(0.3);
+  const [ref, inView] = useInView(0.1);
 
   const contacts = [
-    { label: "University Email", value: "abdulerahman.majid@uomosul.edu.iq", link: "mailto:abdulerahman.majid@uomosul.edu.iq" },
-    { label: "Personal Email", value: "abdulrahman.majad.adnan@gmail.com", link: "mailto:abdulrahman.majad.adnan@gmail.com" },
-    { label: "LinkedIn", value: "linkedin.com/in/abdulrahman-majid-adnan", link: "https://linkedin.com/in/abdulrahman-majid-adnan" },
-    { label: "Phone", value: "+964 770 574 9291", link: "tel:+9647705749291" },
+    { label: "Email", value: "abdmajed547@gmail.com", link: "mailto:abdmajed547@gmail.com" },
+    { label: "Phone", value: "+964 773 841 8489", link: "tel:+9647738418489" },
+    { label: "LinkedIn", value: "linkedin.com/in/abdulrahman-majid", link: "https://www.linkedin.com/in/abdulrahman-majid/" },
   ];
 
   return (
@@ -646,7 +853,7 @@ function Contact() {
 
       <div className="max-w-4xl mx-auto px-6 w-full relative z-10">
         <div
-          className={`text-center mb-20 transition-all duration-1000 ${
+          className={`text-center mb-20 transition-all duration-500 ${
             inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           }`}
         >
@@ -680,7 +887,7 @@ function Contact() {
           ))}
         </div>
 
-        <div className={`mt-24 text-center transition-all duration-1000 delay-500 ${
+        <div className={`mt-24 text-center transition-all duration-500 delay-500 ${
           inView ? 'opacity-100' : 'opacity-0'
         }`}>
           <div className="inline-block p-8 bg-white/60 backdrop-blur border border-amber-200/50 rounded-3xl">
@@ -733,6 +940,7 @@ function App() {
       <Hero />
       <IdentityReveal />
       <Philosophy />
+      <NCSECyberEvent />
       <NationalCTF />
       <Achievements />
       <CyberKhana />

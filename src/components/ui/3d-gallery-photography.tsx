@@ -30,6 +30,8 @@ interface InfiniteGalleryProps {
     className?: string;
     style?: React.CSSProperties;
     singleLoop?: boolean; // Stop after showing all images once
+    finalImageIndex?: number; // Index of image to end on
+    onComplete?: () => void; // Callback when scroll-jacking completes
 }
 
 interface PlaneData {
@@ -183,12 +185,15 @@ function GalleryScene({
         maxBlur: 3.0,
     },
     singleLoop = false,
+    finalImageIndex = 0,
+    onComplete,
 }: Omit<InfiniteGalleryProps, 'className' | 'style'>) {
     const [scrollVelocity, setScrollVelocity] = useState(0);
     const [autoPlay, setAutoPlay] = useState(true);
     const [hasCompletedLoop, setHasCompletedLoop] = useState(false);
     const lastInteraction = useRef(Date.now());
-    const totalScrollDistance = useRef(0);
+    const totalScrolled = useRef(0);
+    const hasCalledComplete = useRef(false);
 
     const normalizedImages = useMemo(
         () =>
@@ -257,8 +262,9 @@ function GalleryScene({
 
     const handleWheel = useCallback(
         (event: WheelEvent) => {
-            // Don't prevent default if single loop is complete - allow native scrolling
+            // Don't prevent default if single loop is complete or not at top - allow native scrolling
             if (singleLoop && hasCompletedLoop) return;
+            if (window.scrollY > 100) return; // Allow normal scrolling if not at top
             event.preventDefault();
             setScrollVelocity((prev) => prev + event.deltaY * 0.01 * speed);
             setAutoPlay(false);
@@ -270,6 +276,7 @@ function GalleryScene({
     const handleKeyDown = useCallback(
         (event: KeyboardEvent) => {
             if (singleLoop && hasCompletedLoop) return;
+            if (window.scrollY > 100) return; // Allow normal behavior if not at top
             if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
                 setScrollVelocity((prev) => prev - 2 * speed);
                 setAutoPlay(false);
@@ -284,16 +291,14 @@ function GalleryScene({
     );
 
     useEffect(() => {
-        const canvas = document.querySelector('canvas');
-        if (canvas) {
-            canvas.addEventListener('wheel', handleWheel, { passive: false });
-            document.addEventListener('keydown', handleKeyDown);
+        // Listen on window so scrolling works anywhere on the screen
+        window.addEventListener('wheel', handleWheel, { passive: false });
+        window.addEventListener('keydown', handleKeyDown);
 
-            return () => {
-                canvas.removeEventListener('wheel', handleWheel);
-                document.removeEventListener('keydown', handleKeyDown);
-            };
-        }
+        return () => {
+            window.removeEventListener('wheel', handleWheel);
+            window.removeEventListener('keydown', handleKeyDown);
+        };
     }, [handleWheel, handleKeyDown]);
 
     useEffect(() => {
@@ -306,13 +311,34 @@ function GalleryScene({
     }, []);
 
     useFrame((state, delta) => {
-        if (singleLoop && hasCompletedLoop) return;
+        // If completed, stop all animation
+        if (singleLoop && hasCompletedLoop) {
+            return;
+        }
 
         if (autoPlay) {
-            setScrollVelocity((prev) => prev + 0.3 * delta);
+            setScrollVelocity((prev) => prev + 0.5 * delta);
         }
 
         setScrollVelocity((prev) => prev * 0.95);
+
+        // Track total scroll distance
+        if (singleLoop) {
+            totalScrolled.current += Math.abs(scrollVelocity * delta * 10);
+
+            // Complete after a short scroll - just enough to show a few images
+            const requiredScroll = depthRange * 2.5;
+            if (totalScrolled.current >= requiredScroll && !hasCompletedLoop) {
+                setHasCompletedLoop(true);
+                setScrollVelocity(0);
+                setAutoPlay(false);
+
+                if (onComplete && !hasCalledComplete.current) {
+                    hasCalledComplete.current = true;
+                    onComplete();
+                }
+            }
+        }
 
         const time = state.clock.getElapsedTime();
         materials.forEach((material) => {
@@ -334,16 +360,6 @@ function GalleryScene({
             if (newZ >= totalRange) {
                 wrapsForward = Math.floor(newZ / totalRange);
                 newZ -= totalRange * wrapsForward;
-
-                // Track total scroll distance for single loop mode
-                if (singleLoop) {
-                    totalScrollDistance.current += wrapsForward;
-                    // Each full cycle through all images counts as one complete loop
-                    if (totalScrollDistance.current >= totalImages / visibleCount) {
-                        setHasCompletedLoop(true);
-                        setScrollVelocity(0);
-                    }
-                }
             } else if (newZ < 0) {
                 wrapsBackward = Math.ceil(-newZ / totalRange);
                 newZ += totalRange * wrapsBackward;
@@ -364,8 +380,9 @@ function GalleryScene({
             plane.y = spatialPositions[i]?.y ?? 0;
 
             const normalizedPosition = plane.z / totalRange;
-            let opacity = 1;
 
+            // Calculate opacity
+            let opacity = 1;
             if (
                 normalizedPosition >= fadeSettings.fadeIn.start &&
                 normalizedPosition <= fadeSettings.fadeIn.end
@@ -390,8 +407,8 @@ function GalleryScene({
 
             opacity = Math.max(0, Math.min(1, opacity));
 
+            // Calculate blur
             let blur = 0;
-
             if (
                 normalizedPosition >= blurSettings.blurIn.start &&
                 normalizedPosition <= blurSettings.blurIn.end
@@ -439,6 +456,7 @@ function GalleryScene({
                 const aspect = texture.image
                     ? texture.image.width / texture.image.height
                     : 1;
+
                 const scale: [number, number, number] =
                     aspect > 1 ? [2 * aspect, 2, 1] : [2, 2 / aspect, 1];
 
@@ -489,6 +507,8 @@ export default function InfiniteGallery({
     className = 'h-96 w-full',
     style,
     singleLoop = false,
+    finalImageIndex = 0,
+    onComplete,
     fadeSettings = {
         fadeIn: { start: 0.05, end: 0.25 },
         fadeOut: { start: 0.4, end: 0.43 },
@@ -533,6 +553,8 @@ export default function InfiniteGallery({
                     fadeSettings={fadeSettings}
                     blurSettings={blurSettings}
                     singleLoop={singleLoop}
+                    finalImageIndex={finalImageIndex}
+                    onComplete={onComplete}
                 />
             </Canvas>
         </div>
