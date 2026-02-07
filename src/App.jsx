@@ -18,6 +18,7 @@ import nullOSLogo from '/images/NullOS.png';
 import edconaLogo from '/images/EdconaIcon.png';
 import universityLogo from '/images/university_of_mosul_logo.png';
 import hackviserLogo from '/images/Hackviser_logo.jpeg';
+import ineLogo from '/images/ine_logo.webp';
 
 // Gallery images - homepage-me.png is NOT included (shown separately at end)
 const galleryImages = [
@@ -210,7 +211,7 @@ function IdentityReveal() {
           {[
             { value: '3rd', label: 'National CTF' },
             { value: '100+', label: 'Students' },
-            { value: '2', label: 'Certifications' },
+            { value: '3', label: 'Certifications' },
           ].map((stat, i) => (
             <div key={i} className="text-center">
               <p className="text-3xl md:text-4xl font-bold text-amber-950">{stat.value}</p>
@@ -231,10 +232,10 @@ function Philosophy() {
   const [ref4, inView4] = useInView(0.1);
 
   const thoughts = [
-    { ref: ref1, inView: inView1, text: "Security is not a skill—it is a responsibility.", delay: "" },
-    { ref: ref2, inView: inView2, text: "I build tools, not just learn theory.", delay: "delay-200" },
-    { ref: ref3, inView: inView3, text: "Leadership through action, not titles.", delay: "delay-400" },
-    { ref: ref4, inView: inView4, text: "Continuous learning is a system, not a goal.", delay: "delay-600" },
+    { ref: ref1, inView: inView1, text: "I prioritize hands-on experience. Every tool I build solves a real problem.", delay: "" },
+    { ref: ref2, inView: inView2, text: "Security research requires both offensive and defensive perspectives.", delay: "delay-200" },
+    { ref: ref3, inView: inView3, text: "Complex vulnerabilities need clear documentation and proof of concept.", delay: "delay-400" },
+    { ref: ref4, inView: inView4, text: "Teaching and knowledge sharing strengthen the entire security community.", delay: "delay-600" },
   ];
 
   return (
@@ -780,10 +781,17 @@ function Certifications() {
     {
       name: "Certified Associate Penetration Tester (CAPT)",
       url: "https://hackviser.com/verify?id=HV-CAPT-AQ5ADMRR",
+      logo: hackviserLogo,
     },
     {
       name: "Certified Web Security Expert (CSWE)",
       url: "https://hackviser.com/verify?id=HV-CWSE-2CV22SMN",
+      logo: hackviserLogo,
+    },
+    {
+      name: "eLearnSecurity Web Application Penetration Tester eXtreme (eWPTX)",
+      url: "https://certs.ine.com/b3ab8536-2069-41d0-8a06-98d96de68e36#acc.yKVHUBxY",
+      logo: ineLogo,
     },
   ];
 
@@ -815,7 +823,7 @@ function Certifications() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                      <img src={hackviserLogo} alt="Hackviser" className="w-full h-full object-cover" />
+                      <img src={cert.logo} alt={cert.name} className="w-full h-full object-cover" />
                     </div>
                     <h3 className="font-display text-xl md:text-2xl font-bold text-amber-950">{cert.name}</h3>
                   </div>
