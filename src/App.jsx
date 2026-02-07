@@ -907,9 +907,9 @@ function App() {
       <NationalCTF />
       <Achievements />
       <CyberKhana />
+      <Certifications />
       <Projects />
       <Education />
-      <Certifications />
       <Contact />
     </div>
   );
