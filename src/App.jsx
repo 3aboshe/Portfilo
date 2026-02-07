@@ -38,21 +38,34 @@ const galleryImages = [
 
 // Hero Section with 3D Gallery and Scroll-Jacking
 function Hero() {
-  // Check if user is at top of page on load
-  const isAtTop = typeof window !== 'undefined' && window.scrollY < 100;
-  const [isLocked, setIsLocked] = useState(isAtTop);
-  const [galleryComplete, setGalleryComplete] = useState(!isAtTop);
-  const [showFinalImage, setShowFinalImage] = useState(!isAtTop);
+  // Initialize as unlocked to prevent freeze on refresh
+  const [isLocked, setIsLocked] = useState(false);
+  const [galleryComplete, setGalleryComplete] = useState(false);
+  const [showFinalImage, setShowFinalImage] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
-  // Lock body scroll only when at hero section and gallery not complete
+  // Initialize states based on scroll position on mount
   useEffect(() => {
-    // If user scrolled down before page load, skip the animation
-    if (window.scrollY > 100) {
+    const isAtTop = window.scrollY < 100;
+
+    if (isAtTop) {
+      // User is at top, enable gallery animation
+      setIsLocked(true);
+      setGalleryComplete(false);
+      setShowFinalImage(false);
+    } else {
+      // User scrolled down, skip animation
       setIsLocked(false);
       setGalleryComplete(true);
       setShowFinalImage(true);
-      return;
     }
+
+    setInitialized(true);
+  }, []);
+
+  // Lock body scroll only when at hero section and gallery not complete
+  useEffect(() => {
+    if (!initialized) return;
 
     if (isLocked) {
       document.body.style.overflow = 'hidden';
@@ -62,7 +75,7 @@ function Hero() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isLocked]);
+  }, [isLocked, initialized]);
 
   const handleGalleryComplete = () => {
     setGalleryComplete(true);
