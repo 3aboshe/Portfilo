@@ -18,7 +18,7 @@ import nullOSLogo from '/images/NullOS.png';
 import edconaLogo from '/images/EdconaIcon.png';
 import universityLogo from '/images/university_of_mosul_logo.png';
 import hackviserLogo from '/images/Hackviser_logo.jpeg';
-import ineLogo from '/images/ine_logo.webp';
+import ewptxBadge from '/images/ewptx.svg';
 
 // Gallery images - homepage-me.png is NOT included (shown separately at end)
 const galleryImages = [
@@ -791,7 +791,7 @@ function Certifications() {
     {
       name: "eLearnSecurity Web Application Penetration Tester eXtreme (eWPTX)",
       url: "https://certs.ine.com/b3ab8536-2069-41d0-8a06-98d96de68e36#acc.yKVHUBxY",
-      logo: ineLogo,
+      logo: ewptxBadge,
     },
   ];
 
