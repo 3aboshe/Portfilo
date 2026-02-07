@@ -223,50 +223,6 @@ function IdentityReveal() {
     </section>
   );
 }
-
-// Philosophy Section
-function Philosophy() {
-  const [ref1, inView1] = useInView(0.1);
-  const [ref2, inView2] = useInView(0.1);
-  const [ref3, inView3] = useInView(0.1);
-  const [ref4, inView4] = useInView(0.1);
-
-  const thoughts = [
-    { ref: ref1, inView: inView1, text: "I prioritize hands-on experience. Every tool I build solves a real problem.", delay: "" },
-    { ref: ref2, inView: inView2, text: "Security research requires both offensive and defensive perspectives.", delay: "delay-200" },
-    { ref: ref3, inView: inView3, text: "Complex vulnerabilities need clear documentation and proof of concept.", delay: "delay-400" },
-    { ref: ref4, inView: inView4, text: "Teaching and knowledge sharing strengthen the entire security community.", delay: "delay-600" },
-  ];
-
-  return (
-    <section className="py-32 bg-amber-50 relative">
-      <div className="max-w-4xl mx-auto px-6">
-        <div className="text-center mb-20">
-          <p className="text-amber-600 font-medium mb-4">MY APPROACH</p>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-amber-950">Philosophy</h2>
-        </div>
-
-        {thoughts.map((thought, index) => (
-          <div
-            key={index}
-            ref={thought.ref}
-            className={`mb-16 group transition-all duration-500 ${thought.delay} ${
-              thought.inView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
-            }`}
-          >
-            <div className="flex items-start gap-6">
-              <div className="w-2 h-2 bg-amber-400 rounded-full mt-8 flex-shrink-0"></div>
-              <p className="font-display text-2xl md:text-4xl text-amber-950 leading-relaxed">
-                {thought.text}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 // National CTF - Main Centerpiece
 function NationalCTF() {
   const [ref, inView] = useInView(0.1);
@@ -947,7 +903,6 @@ function App() {
       <ScrollProgress />
       <Hero />
       <IdentityReveal />
-      <Philosophy />
       <NCSECyberEvent />
       <NationalCTF />
       <Achievements />
