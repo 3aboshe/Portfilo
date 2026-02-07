@@ -778,8 +778,8 @@ function Certifications() {
               <div className="p-8 bg-white/60 backdrop-blur border border-amber-200/50 rounded-2xl group-hover:bg-white/80 group-hover:border-amber-400/30 transition-all duration-300">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                      <img src={cert.logo} alt={cert.name} className="w-full h-full object-cover" />
+                    <div className="w-16 h-16 rounded-lg flex-shrink-0 flex items-center justify-center">
+                      <img src={cert.logo} alt={cert.name} className="w-full h-full object-contain" />
                     </div>
                     <h3 className="font-display text-xl md:text-2xl font-bold text-amber-950">{cert.name}</h3>
                   </div>
